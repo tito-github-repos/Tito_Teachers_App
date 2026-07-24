@@ -30,9 +30,15 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset(
-                    "assets/images/logo.png",
-                    height: 120,
+                  // Image.asset(
+                  //   "assets/images/logo.png",
+                  //   height: 120,
+                  // ),
+
+ const Icon(
+                    Icons.school_rounded,
+                    size: 90,
+                    color: Colors.blue,
                   ),
 
                   const SizedBox(height: 25),

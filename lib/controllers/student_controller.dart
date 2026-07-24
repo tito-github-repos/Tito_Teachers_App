@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../models/user_model.dart';
-import '../repositories/student_repository.dart';
+import '../repositories/student_repo.dart';
 
 class StudentController extends GetxController {
   final StudentRepository _repository = StudentRepository();

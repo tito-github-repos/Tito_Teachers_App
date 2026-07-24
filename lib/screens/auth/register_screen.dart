@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/controllers/auth_controller.dart';
+import 'package:tito_teachers_app/controllers/class_controller.dart';
+import 'package:tito_teachers_app/controllers/subject_controller.dart';
+import 'package:tito_teachers_app/models/class_model.dart';
 import 'package:tito_teachers_app/models/subjects_model.dart';
 
-import '../../controllers/auth_controller.dart';
-import '../../controllers/class_controller.dart';
-import '../../controllers/subject_controller.dart';
-import '../../models/class_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -16,10 +16,15 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final AuthController auth = AuthController.instance;
-  final ClassController classController = Get.find<ClassController>();
-  final SubjectController subjectController = Get.find<SubjectController>();
 
-  final _formKey = GlobalKey<FormState>();
+  final ClassController classController =
+      Get.find<ClassController>();
+
+  final SubjectController subjectController =
+      Get.find<SubjectController>();
+
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>();
 
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
@@ -41,13 +46,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
             key: _formKey,
             child: Obx(
               () => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment:
+                    CrossAxisAlignment.stretch,
                 children: [
+                  // Image.asset(
+                  //   "assets/images/logo.png",
+                  //   height: 100,
+                  // ),
 
-                  Image.asset(
-                    "assets/images/logo.png",
-                    height: 100,
+
+ const Icon(
+                    Icons.school_rounded,
+                    size: 90,
+                    color: Colors.blue,
                   ),
+
 
                   const SizedBox(height: 25),
 
@@ -58,7 +71,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       prefixIcon: Icon(Icons.person),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null ||
+                          value.trim().isEmpty) {
                         return "Enter your name";
                       }
                       return null;
@@ -69,13 +83,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   TextFormField(
                     controller: auth.phoneController,
-                    keyboardType: TextInputType.phone,
+                    keyboardType:
+                        TextInputType.phone,
                     decoration: const InputDecoration(
                       labelText: "Phone Number",
                       prefixIcon: Icon(Icons.phone),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null ||
+                          value.trim().isEmpty) {
                         return "Enter phone number";
                       }
                       return null;
@@ -86,13 +102,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   TextFormField(
                     controller: auth.emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType:
+                        TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: "Email",
                       prefixIcon: Icon(Icons.email),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (value == null ||
+                          value.trim().isEmpty) {
                         return "Enter email";
                       }
                       return null;
@@ -102,11 +120,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 15),
 
                   TextFormField(
-                    controller: auth.passwordController,
+                    controller:
+                        auth.passwordController,
                     obscureText: obscurePassword,
                     decoration: InputDecoration(
                       labelText: "Password",
-                      prefixIcon: const Icon(Icons.lock),
+                      prefixIcon:
+                          const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
                           obscurePassword
@@ -115,13 +135,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         onPressed: () {
                           setState(() {
-                            obscurePassword = !obscurePassword;
+                            obscurePassword =
+                                !obscurePassword;
                           });
                         },
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.length < 6) {
+                      if (value == null ||
+                          value.length < 6) {
                         return "Minimum 6 characters";
                       }
                       return null;
@@ -131,11 +153,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 15),
 
                   TextFormField(
-                    controller: auth.confirmPasswordController,
-                    obscureText: obscureConfirmPassword,
+                    controller: auth
+                        .confirmPasswordController,
+                    obscureText:
+                        obscureConfirmPassword,
                     decoration: InputDecoration(
-                      labelText: "Confirm Password",
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      labelText:
+                          "Confirm Password",
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           obscureConfirmPassword
@@ -151,7 +178,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (value != auth.passwordController.text) {
+                      if (value !=
+                          auth.passwordController
+                              .text) {
                         return "Passwords do not match";
                       }
                       return null;
@@ -163,35 +192,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Text(
                     "Select Role",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight:
+                          FontWeight.bold,
                     ),
                   ),
 
                   RadioListTile<String>(
                     value: "student",
-                    groupValue: auth.selectedRole.value,
+                    groupValue:
+                        auth.selectedRole.value,
                     title: const Text("Student"),
                     onChanged: (value) {
                       auth.setRole(value!);
+
+                      setState(() {
+                        selectedClass = null;
+                        selectedSubject = null;
+                      });
                     },
                   ),
 
                   RadioListTile<String>(
                     value: "teacher",
-                    groupValue: auth.selectedRole.value,
+                    groupValue:
+                        auth.selectedRole.value,
                     title: const Text("Teacher"),
                     onChanged: (value) {
                       auth.setRole(value!);
+
+                      setState(() {
+                        selectedClass = null;
+                        selectedSubject = null;
+                      });
                     },
                   ),
 
                   const SizedBox(height: 20),
-
+                                    ///===============================
+                  /// Student
+                  ///===============================
                   if (auth.selectedRole.value == "student") ...[
                     DropdownButtonFormField<ClassModel>(
                       value: selectedClass,
                       decoration: const InputDecoration(
                         labelText: "Select Class",
+                        prefixIcon: Icon(Icons.school),
                       ),
                       items: classController.classes
                           .map(
@@ -213,14 +259,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           );
                         }
                       },
+                      validator: (value) {
+                        if (auth.selectedRole.value == "student" &&
+                            value == null) {
+                          return "Please select class";
+                        }
+                        return null;
+                      },
                     ),
                   ],
 
+                  ///===============================
+                  /// Teacher
+                  ///===============================
                   if (auth.selectedRole.value == "teacher") ...[
                     DropdownButtonFormField<ClassModel>(
                       value: selectedClass,
                       decoration: const InputDecoration(
                         labelText: "Select Class",
+                        prefixIcon: Icon(Icons.school),
                       ),
                       items: classController.classes
                           .map(
@@ -243,6 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       value: selectedSubject,
                       decoration: const InputDecoration(
                         labelText: "Select Subject",
+                        prefixIcon: Icon(Icons.menu_book),
                       ),
                       items: subjectController.subjects
                           .map(
@@ -261,110 +319,114 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 15),
 
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        if (selectedClass == null ||
-                            selectedSubject == null) {
-                          Get.snackbar(
-                            "Error",
-                            "Select both Class and Subject",
+                    SizedBox(
+                      height: 45,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text("Add Assignment"),
+                        onPressed: () {
+                          if (selectedClass == null ||
+                              selectedSubject == null) {
+                            Get.snackbar(
+                              "Error",
+                              "Please select both Class and Subject",
+                              snackPosition:
+                                  SnackPosition.BOTTOM,
+                            );
+                            return;
+                          }
+
+                          auth.addTeachingAssignment(
+                            classId: selectedClass!.id,
+                            className: selectedClass!.name,
+                            subjectId: selectedSubject!.id,
+                            subjectName: selectedSubject!.name,
                           );
-                          return;
-                        }
 
-                        auth.addTeachingAssignment(
-                          classId: selectedClass!.id,
-                          className: selectedClass!.name,
-                          subjectId: selectedSubject!.id,
-                          subjectName: selectedSubject!.name,
-                        );
-
-                        setState(() {
-                          selectedSubject = null;
-                        });
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text("Add Assignment"),
+                          setState(() {
+                            selectedSubject = null;
+                          });
+                        },
+                      ),
                     ),
 
                     const SizedBox(height: 20),
-                                        Obx(
-                      () {
-                        if (auth.teachingAssignments.isEmpty) {
-                          return const SizedBox();
-                        }
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Teaching Assignments",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                    Obx(() {
+                      if (auth.teachingAssignments.isEmpty) {
+                        return const SizedBox();
+                      }
+
+                      return Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Teaching Assignments",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
+                          ),
 
-                            const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                            ListView.separated(
-                              shrinkWrap: true,
-                              physics:
-                                  const NeverScrollableScrollPhysics(),
-                              itemCount:
-                                  auth.teachingAssignments.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 8),
-                              itemBuilder: (context, index) {
-                                final assignment =
-                                    auth.teachingAssignments[index];
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics:
+                                const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                auth.teachingAssignments.length,
+                            itemBuilder: (context, index) {
+                              final assignment =
+                                  auth.teachingAssignments[index];
 
-                                return Card(
-                                  child: ListTile(
-                                    leading: const Icon(
-                                      Icons.menu_book,
-                                    ),
-                                    title: Text(
-                                      assignment.subjectName,
-                                    ),
-                                    subtitle: Text(
-                                      assignment.className,
-                                    ),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () {
-                                        auth.removeTeachingAssignment(
-                                          assignment,
-                                        );
-                                      },
-                                    ),
+                              return Card(
+                                margin: const EdgeInsets.only(
+                                  bottom: 8,
+                                ),
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.menu_book,
                                   ),
-                                );
-                              },
-                            ),
-
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      },
-                    ),
-
-                  const SizedBox(height: 30),
+                                  title: Text(
+                                    assignment.subjectName,
+                                  ),
+                                  subtitle: Text(
+                                    assignment.className,
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      auth.removeTeachingAssignment(
+                                        assignment,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                                    const SizedBox(height: 30),
 
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(
                       onPressed: auth.isLoading.value
                           ? null
-                          : () {
+                          : () async {
                               FocusScope.of(context).unfocus();
 
                               if (_formKey.currentState!
                                   .validate()) {
-                                auth.register();
+                                await auth.register();
                               }
                             },
                       child: auth.isLoading.value
@@ -381,6 +443,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               "Register",
                               style: TextStyle(
                                 fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                     ),
@@ -405,11 +468,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                 ],
-                ]
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

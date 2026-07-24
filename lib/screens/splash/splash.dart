@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,59 +12,75 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AuthController _authController = Get.find<AuthController>();
 
-final controller = Get.find<AuthController>();
   @override
   void initState() {
     super.initState();
-
-    controller.checkLoginStatus();
+    _checkLogin();
   }
+Future<void> _checkLogin() async {
+  await Future.delayed(const Duration(seconds: 2));
+
+  final user = await _authController.loadCurrentUser();
+
+  if (!mounted) return;
+
+  if (user == null) {
+    Get.offAllNamed(AppRoutes.login);
+    return;
+  }
+
+  switch (user.role.toLowerCase()) {
+    case "teacher":
+      Get.offAllNamed(AppRoutes.teacher);
+      break;
+
+    case "student":
+      Get.offAllNamed(AppRoutes.student);
+      break;
+
+    case "admin":
+      Get.offAllNamed(AppRoutes.admin);
+      break;
+
+    default:
+      Get.offAllNamed(AppRoutes.login);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Image.asset(
+              //   'assets/images/logo.png',
+              //   height: 120,
+              // ),
 
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xff2563EB),
-              Color(0xff3B82F6),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+              
+ const Icon(
+                    Icons.school_rounded,
+                    size: 90,
+                    color: Colors.blue,
+                  ),
 
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-
-            Icon(
-              Icons.school_rounded,
-              size: 100,
-              color: Colors.white,
-            ),
-
-            SizedBox(height: 20),
-
-            Text(
-              "TITO Teachers App",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 24),
+              const Text(
+                'Tito Teachers',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-
-            SizedBox(height: 40),
-
-            CircularProgressIndicator(
-              color: Colors.white,
-            )
-          ],
+              const SizedBox(height: 32),
+              const CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );

@@ -39,7 +39,7 @@ class TopicController extends GetxController {
   //==========================================================
   // Init
   //==========================================================
-
+final RxSet<String> completedTopicIds = <String>{}.obs;
   @override
   void onClose() {
     _subscription?.cancel();
@@ -49,7 +49,24 @@ class TopicController extends GetxController {
   //==========================================================
   // Selection
   //==========================================================
+Future<void> loadCompletedTopics({
+  required String teacherId,
+  required String classId,
+  required String subjectId,
+}) async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('topic_progress')
+      .where('teacherId', isEqualTo: teacherId)
+      .where('classId', isEqualTo: classId)
+      .where('subjectId', isEqualTo: subjectId)
+      .get();
 
+  completedTopicIds.clear();
+
+  for (final doc in snapshot.docs) {
+    completedTopicIds.add(doc['topicId']);
+  }
+}
   void setClass(String classId) {
     selectedClassId.value = classId;
   }
@@ -268,4 +285,13 @@ class TopicController extends GetxController {
     activeTopics.clear();
     selectedTopic.value = null;
   }
+  void listenAllTopics() {
+  _subscription?.cancel();
+
+  _subscription = _repository
+      .streamAllTopics()
+      .listen((data) {
+    topics.assignAll(data);
+  });
+}
 }

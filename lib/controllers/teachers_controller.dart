@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:tito_teachers_app/repositories/teachers_repository.dart';
+import 'package:tito_teachers_app/repositories/teachers_repo.dart';
 
 import '../models/user_model.dart';
 
