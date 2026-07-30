@@ -93,15 +93,14 @@ class MonthlyPaymentGenerator {
         );
 
         details.add(
-          _calculator.createTeacherDetail(
-            subjectId: subjectId,
-            subjectName:
-                teacher.subjectNames[subjectId] ??
-                    "",
-            minutes: minutes,
-            ratePerMinute: rate,
-          ),
-        );
+  _calculator.createTeacherDetail(
+    subjectId: subjectId,
+    subjectName:
+        teacher.subjectNames[subjectId] ?? "",
+    minutes: minutes,
+    ratePerHour: rate,
+  ),
+);
       },
     );
 

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/controllers/auth_controller.dart';
+import 'package:tito_teachers_app/models/assigned_teacher_model.dart';
 import 'package:tito_teachers_app/models/student_subject_model.dart';
 import 'package:tito_teachers_app/repositories/topic_prograss_repo.dart';
 
@@ -111,13 +113,28 @@ StreamSubscription<List<TopicProgressModel>>?
         .listen((event) {
       teacherHistory.assignAll(event);
     });
-  }void listenClassHistory(String classId) {
+  }
+void listenClassHistory(
+  String classId,
+  List<AssignedTeacherModel> assignedTeachers,
+) {
   _classSubscription?.cancel();
 
   _classSubscription = _repository
       .streamClassHistory(classId)
       .listen((event) {
-    classHistory.assignAll(event);
+
+    final teacherMap = {
+      for (final item in assignedTeachers)
+        item.subjectId: item.teacherId,
+    };
+
+    classHistory.assignAll(
+      event.where((progress) {
+        return teacherMap[progress.subjectId] ==
+            progress.teacherId;
+      }).toList(),
+    );
   });
 }
 
@@ -221,10 +238,17 @@ StreamSubscription<List<TopicProgressModel>>?
     }
   }
 
-  Future<List<StudentSubjectItem>> getStudentSubjects({
+
+
+Future<List<StudentSubjectItem>> getStudentSubjects({
   required String classId,
 }) async {
   final firestore = FirebaseFirestore.instance;
+
+  final student = AuthController.instance.user!;
+
+  final assignedSubjectIds = student.subjectIds;
+  final assignedTeachers = student.assignedTeachers;
 
   // Get all teachers
   final teacherSnapshot = await firestore
@@ -232,45 +256,49 @@ StreamSubscription<List<TopicProgressModel>>?
       .where("role", isEqualTo: "teacher")
       .get();
 
-  // Get all topic progress for this class
+  // Get topic progress
   final progressSnapshot = await firestore
       .collection("topic_progress")
       .where("classId", isEqualTo: classId)
       .get();
 
-  // Unique subjects from teacher assignments
   final Map<String, String> subjects = {};
 
   for (final teacher in teacherSnapshot.docs) {
     final data = teacher.data();
 
     final assignments =
-        (data["teachingAssignments"] as List<dynamic>? ?? []);
+        data["teachingAssignments"] as List<dynamic>? ?? [];
 
     for (final item in assignments) {
-      final assignment =
-          Map<String, dynamic>.from(item);
+      final assignment = Map<String, dynamic>.from(item);
 
-      if (assignment["classId"] == classId) {
+      if (assignment["classId"] == classId &&
+          assignedSubjectIds.contains(assignment["subjectId"])) {
+
         subjects[assignment["subjectId"]] =
             assignment["subjectName"];
       }
     }
   }
 
-  // Count completed topics
   final Map<String, int> counts = {};
 
-  for (final doc in progressSnapshot.docs) {
-    final data = doc.data();
+ final Map<String, String> teacherMap = {
+  for (final item in assignedTeachers)
+    item.subjectId: item.teacherId,
+};
 
-    final subjectId = data["subjectId"];
+for (final doc in progressSnapshot.docs) {
+  final data = doc.data();
 
-    counts[subjectId] =
-        (counts[subjectId] ?? 0) + 1;
+  final subjectId = data["subjectId"] as String;
+  final teacherId = data["teacherId"] as String;
+
+  if (teacherMap[subjectId] == teacherId) {
+    counts[subjectId] = (counts[subjectId] ?? 0) + 1;
   }
-
-  // Build list
+}
   return subjects.entries.map((e) {
     return StudentSubjectItem(
       subjectId: e.key,
@@ -278,10 +306,7 @@ StreamSubscription<List<TopicProgressModel>>?
       completedTopics: counts[e.key] ?? 0,
     );
   }).toList();
-}
-
-  //==========================================================
-  // Helpers
+}  // Helpers
   //==========================================================
 
   void clearHistory() {

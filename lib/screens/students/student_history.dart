@@ -19,15 +19,22 @@ class _StudentHistoryScreenState
   final auth = AuthController.instance;
   final controller =
       TopicProgressController.instance;
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
+  final user = auth.user;
 
-    controller.listenClassHistory(
-      auth.user!.classId!,
-    );
+  if (user == null || user.classId == null) {
+    return;
   }
+
+  controller.listenClassHistory(
+    user.classId!,
+      user.assignedTeachers,
+
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +57,19 @@ class _StudentHistoryScreenState
       body: Obx(() {
 
         final history = controller.classHistory;
-
+final user = auth.user;
         final today = DateTime.now();
-
+if (user == null || user.classId == null) {
+  return const Center(
+    child: Padding(
+      padding: EdgeInsets.all(24),
+      child: Text(
+        "Your class has not been assigned yet.\nPlease contact the administrator.",
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
+}
         final todayCount = history.where((e) {
           final d = e.completedAt.toDate();
 

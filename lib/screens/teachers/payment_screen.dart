@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/constants/date_helper.dart';
 
 import '../../controllers/payment_controller.dart';
 import '../../models/monthly_payment_model.dart';
@@ -21,6 +22,9 @@ class TeacherMyPaymentsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Payments"),
+        centerTitle: true,
+      backgroundColor: Colors.indigo,
+      foregroundColor: Colors.white,
       ),
 
       body: Obx(() {
@@ -102,8 +106,10 @@ class TeacherMyPaymentsScreen extends StatelessWidget {
           children: [
 
             Text(
-              "Month : ${payment.month}/${payment.year}",
-            ),
+"Month : ${DateHelper.monthYear(
+  payment.month,
+  payment.year,
+)}"            ),
 
             const SizedBox(height: 5),
 
@@ -263,7 +269,10 @@ void _showPaymentInfo(
 
               _infoRow(
                 "Month",
-                "${payment.month}/${payment.year}",
+                DateHelper.monthYear(
+                  payment.month,
+                  payment.year,
+                ),
               ),
 
               _infoRow(
@@ -285,9 +294,9 @@ void _showPaymentInfo(
                 "Due Date",
                 payment.dueDate == null
                     ? "-"
-                    : "${payment.dueDate!.day.toString().padLeft(2, '0')}/"
-                        "${payment.dueDate!.month.toString().padLeft(2, '0')}/"
-                        "${payment.dueDate!.year}",
+                  : DateHelper.formatDate(
+  payment.dueDate,
+)
               ),
 
               _infoRow(

@@ -22,20 +22,28 @@ class _StudentProfileScreenState
       TopicProgressController.instance;
 
       late Future<List<StudentSubjectItem>> _subjectsFuture;
+@override
+void initState() {
+  super.initState();
 
-  @override
-  void initState() {
-    super.initState();
+  final user = auth.user;
 
-    progressController.listenClassHistory(
-      auth.user!.classId!,
-    );
-
-      _subjectsFuture =
-      progressController.getStudentSubjects(
-    classId: auth.user!.classId!,
-  );
+  if (user == null || user.classId == null) {
+    _subjectsFuture = Future.value([]);
+    return;
   }
+
+  progressController.listenClassHistory(
+    user.classId!,
+      user.assignedTeachers,
+
+  );
+
+  _subjectsFuture =
+      progressController.getStudentSubjects(
+    classId: user.classId!,
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +72,37 @@ class _StudentProfileScreenState
             child: CircularProgressIndicator(),
           );
         }
+        if (user.classId == null) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.school_outlined,
+            size: 80,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 20),
+          Text(
+            "Your account is waiting for class assignment.",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 10),
+          Text(
+            "Please contact your administrator.\nYour class and subjects have not been assigned yet.",
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
         final history =
             progressController.classHistory;

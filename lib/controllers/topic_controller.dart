@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/models/topic_progress_model.dart';
 import 'package:tito_teachers_app/repositories/topic_repo.dart';
 
 import '../models/topic_model.dart';
@@ -35,7 +36,8 @@ class TopicController extends GetxController {
   final RxString selectedSubjectId = ''.obs;
 
   StreamSubscription<List<TopicModel>>? _subscription;
-
+final RxMap<String, TopicProgressModel> completedTopicProgress =
+    <String, TopicProgressModel>{}.obs;
   //==========================================================
   // Init
   //==========================================================
@@ -62,9 +64,17 @@ Future<void> loadCompletedTopics({
       .get();
 
   completedTopicIds.clear();
+  completedTopicProgress.clear();
 
   for (final doc in snapshot.docs) {
-    completedTopicIds.add(doc['topicId']);
+    final progress = TopicProgressModel.fromDocument(
+      doc.id,
+      doc.data(),
+    );
+
+    completedTopicIds.add(progress.topicId);
+
+    completedTopicProgress[progress.topicId] = progress;
   }
 }
   void setClass(String classId) {

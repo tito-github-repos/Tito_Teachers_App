@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tito_teachers_app/models/assigned_teacher_model.dart';
 import 'package:tito_teachers_app/models/teacher_assisgnment_model.dart';
 
 
@@ -16,7 +17,9 @@ class UserModel {
   /// Used only for Student
   final String? classId;
   final String? className;
-
+ /// Used only for Student
+final List<String> subjectIds;
+final List<AssignedTeacherModel> assignedTeachers;
   /// Used only for Teacher
   final List<TeachingAssignmentModel> teachingAssignments;
 
@@ -30,6 +33,9 @@ class UserModel {
     required this.role,
     this.classId,
     this.className,
+      this.subjectIds = const [],
+
+this.assignedTeachers = const [],
     required this.teachingAssignments,
     required this.createdAt,
   });
@@ -51,7 +57,18 @@ class UserModel {
       classId: json['classId'],
 
       className: json['className'],
-
+subjectIds: List<String>.from(
+  json['subjectIds'] ?? [],
+),
+assignedTeachers:
+    (json["assignedTeachers"] as List<dynamic>?)
+            ?.map(
+              (e) => AssignedTeacherModel.fromJson(
+                Map<String, dynamic>.from(e),
+              ),
+            )
+            .toList() ??
+        [],
       teachingAssignments:
       (json['teachingAssignments'] as List<dynamic>? ?? [])
           .map(
@@ -81,7 +98,10 @@ class UserModel {
       'classId': classId,
 
       'className': className,
-
+      'subjectIds': subjectIds,
+"assignedTeachers": assignedTeachers
+    .map((e) => e.toJson())
+    .toList(),
       'teachingAssignments':
       teachingAssignments
           .map(
@@ -98,4 +118,14 @@ class UserModel {
   bool get isStudent => role == "student";
 
   bool get isAdmin => role == "admin";
+  factory UserModel.fromDocument(
+  DocumentSnapshot<Map<String, dynamic>> doc,
+) {
+  final data = doc.data()!;
+
+  return UserModel.fromJson({
+    ...data,
+    "uid": doc.id,
+  });
+}
 }

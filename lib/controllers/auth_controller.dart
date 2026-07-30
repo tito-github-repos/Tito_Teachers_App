@@ -265,98 +265,161 @@ Future<UserModel?> loadCurrentUser() async {
   // Register
   //==========================================================
 
-  Future<void> register() async {
-    if (!validateRegister()) return;
+//   Future<void> register() async {
+//     if (!validateRegister()) return;
 
-    try {
-      isLoading.value = true;
+//     try {
+//       isLoading.value = true;
 
-      // Student must select class
-      if (selectedRole.value == "student") {
-        if (selectedClassId.value.isEmpty) {
-          Get.snackbar(
-            "Error",
-            "Please select class",
-          );
-          return;
-        }
-      }
+//       // Student must select class
+//       if (selectedRole.value == "student") {
+//         if (selectedClassId.value.isEmpty) {
+//           Get.snackbar(
+//             "Error",
+//             "Please select class",
+//           );
+//           return;
+//         }
+//       }
 
-      // Teacher must have at least one assignment
-      if (selectedRole.value == "teacher") {
-        if (teachingAssignments.isEmpty) {
-          Get.snackbar(
-            "Error",
-            "Assign at least one Class & Subject",
-          );
-          return;
-        }
-      }
+//       // Teacher must have at least one assignment
+//       if (selectedRole.value == "teacher") {
+//         if (teachingAssignments.isEmpty) {
+//           Get.snackbar(
+//             "Error",
+//             "Assign at least one Class & Subject",
+//           );
+//           return;
+//         }
+//       }
 
-      final credential = await _repository.register(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+//       final credential = await _repository.register(
+//         email: emailController.text.trim(),
+//         password: passwordController.text.trim(),
+//       );
 
-      final uid = credential.user!.uid;
+//       final uid = credential.user!.uid;
 
-      final user = UserModel(
-        uid: uid,
-        name: nameController.text.trim(),
-        phone: phoneController.text.trim(),
-        email: emailController.text.trim(),
-        role: selectedRole.value,
-        classId: selectedRole.value == "student"
-            ? selectedClassId.value
-            : null,
-        className: selectedRole.value == "student"
-            ? selectedClassName.value
-            : null,
-        teachingAssignments:
-            List<TeachingAssignmentModel>.from(
-          teachingAssignments,
-        ),
-        createdAt: Timestamp.now(),
-      );
+//       final user = UserModel(
+//         uid: uid,
+//         name: nameController.text.trim(),
+//         phone: phoneController.text.trim(),
+//         email: emailController.text.trim(),
+//         role: selectedRole.value,
+//         classId: selectedRole.value == "student"
+//             ? selectedClassId.value
+//             : null,
+//         className: selectedRole.value == "student"
+//             ? selectedClassName.value
+//             : null,
+//         teachingAssignments:
+//             List<TeachingAssignmentModel>.from(
+//           teachingAssignments,
+//         ),
+//         createdAt: Timestamp.now(),
+//       );
 
-      await _repository.saveUser(user);
+//       await _repository.saveUser(user);
 
-      currentUser.value = user;
+//       currentUser.value = user;
 
-      Get.snackbar(
-        "Success",
-        "Registration Successful",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+//       Get.snackbar(
+//         "Success",
+//         "Registration Successful",
+//         snackPosition: SnackPosition.BOTTOM,
+//       );
 
 
-switch (user.role.toLowerCase()) {
-  case "teacher":
-    Get.offAllNamed(AppRoutes.teacher);
-    break;
+// switch (user.role.toLowerCase()) {
+//   case "teacher":
+//     Get.offAllNamed(AppRoutes.teacher);
+//     break;
 
-  case "student":
-    Get.offAllNamed(AppRoutes.student);
-    break;
+//   case "student":
+//     Get.offAllNamed(AppRoutes.student);
+//     break;
 
-  case "admin":
-    Get.offAllNamed(AppRoutes.admin);
-    break;
+//   case "admin":
+//     Get.offAllNamed(AppRoutes.admin);
+//     break;
 
-  default:
-    Get.offAllNamed(AppRoutes.login);
-}
-      clearControllers();
-    } catch (e) {
-      Get.snackbar(
-        "Registration Failed",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isLoading.value = false;
+//   default:
+//     Get.offAllNamed(AppRoutes.login);
+// }
+//       clearControllers();
+//     } catch (e) {
+//       Get.snackbar(
+//         "Registration Failed",
+//         e.toString(),
+//         snackPosition: SnackPosition.BOTTOM,
+//       );
+//     } finally {
+//       isLoading.value = false;
+//     }
+//   }
+
+Future<void> register() async {
+  if (!validateRegister()) return;
+
+  try {
+    isLoading.value = true;
+
+    final credential = await _repository.register(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    final uid = credential.user!.uid;
+
+    final user = UserModel(
+      uid: uid,
+      name: nameController.text.trim(),
+      phone: phoneController.text.trim(),
+      email: emailController.text.trim(),
+      role: selectedRole.value,
+        teachingAssignments: [],
+
+      createdAt: Timestamp.now(),
+    );
+
+    await _repository.saveUser(user);
+
+    currentUser.value = user;
+
+    Get.snackbar(
+      "Success",
+      "Registration Successful",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+
+    switch (user.role.toLowerCase()) {
+      case "teacher":
+        Get.offAllNamed(AppRoutes.teacher);
+        break;
+
+      case "student":
+        Get.offAllNamed(AppRoutes.student);
+        break;
+
+      case "admin":
+        Get.offAllNamed(AppRoutes.admin);
+        break;
+
+      default:
+        Get.offAllNamed(AppRoutes.login);
     }
+
+    clearControllers();
+  } catch (e) {
+    Get.snackbar(
+      "Registration Failed",
+      e.toString(),
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  } finally {
+    isLoading.value = false;
   }
+}
 
   //==========================================================
   // Teaching Assignments

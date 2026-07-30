@@ -166,7 +166,7 @@ ListTile(
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: .75,
+              childAspectRatio: .70,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
@@ -258,7 +258,7 @@ Widget _managementBox({
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -277,7 +277,7 @@ Widget _managementBox({
               ),
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 10),
 
             Text(
               title,

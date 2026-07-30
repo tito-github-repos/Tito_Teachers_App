@@ -110,16 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 12),
 
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        auth.resetPassword();
-                      },
-                      child: const Text("Forgot Password?"),
-                    ),
-                  ),
-
+                  
                   const SizedBox(height: 20),
 
                   Obx(

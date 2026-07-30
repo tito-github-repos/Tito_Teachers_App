@@ -13,7 +13,6 @@ import 'package:tito_teachers_app/screens/admin/teachers_list_screen.dart';
 import 'package:tito_teachers_app/screens/admin/topic_manage_screen.dart';
 import 'package:tito_teachers_app/screens/auth/login_screen.dart';
 import 'package:tito_teachers_app/screens/auth/register_screen.dart';
-import 'package:tito_teachers_app/screens/splash/splash.dart';
 import 'package:tito_teachers_app/screens/students/payment_screen.dart';
 import 'package:tito_teachers_app/screens/students/student_history.dart';
 import 'package:tito_teachers_app/screens/students/student_profile.dart';
@@ -28,11 +27,6 @@ import 'package:tito_teachers_app/screens/teachers/topic_screen.dart';
 
 class AppPages {
   static final pages = [
-
-    GetPage(
-      name: AppRoutes.splash,
-      page: () => const SplashScreen(),
-    ),
 
     GetPage(
       name: AppRoutes.login,

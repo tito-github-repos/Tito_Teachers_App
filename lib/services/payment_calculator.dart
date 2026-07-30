@@ -12,23 +12,24 @@ class PaymentCalculator {
   /// ---------------------------------------------------------------------------
   /// TEACHER PAYMENT DETAIL
   /// ---------------------------------------------------------------------------
+MonthlyPaymentDetail createTeacherDetail({
+  required String subjectId,
+  required String subjectName,
+  required int minutes,
+  required double ratePerHour,
+}) {
+  final amount =
+      (minutes / 60.0) * ratePerHour;
 
-  MonthlyPaymentDetail createTeacherDetail({
-    required String subjectId,
-    required String subjectName,
-    required int minutes,
-    required double ratePerMinute,
-  }) {
-    return MonthlyPaymentDetail(
-      subjectId: subjectId,
-      subjectName: subjectName,
-      minutes: minutes,
-      rate: ratePerMinute,
-      monthlyFee: 0,
-      amount: minutes * ratePerMinute,
-    );
-  }
-
+  return MonthlyPaymentDetail(
+    subjectId: subjectId,
+    subjectName: subjectName,
+    minutes: minutes,
+    rate: ratePerHour,
+    monthlyFee: 0,
+    amount: amount,
+  );
+}
   /// ---------------------------------------------------------------------------
   /// STUDENT PAYMENT DETAIL
   /// ---------------------------------------------------------------------------
@@ -144,7 +145,7 @@ class PaymentCalculator {
           .firstWhere(
             (e) => e.subjectId == subjectId,
           )
-          .teacherRatePerMinute;
+          .teacherRatePerHour;
     } catch (_) {
       return 0;
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/models/topic_progress_model.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/topic_controller.dart';
@@ -283,7 +284,8 @@ class _TeacherTopicsScreenState
     final bool completed =
         topicController.completedTopicIds
             .contains(topic.id);
-
+final TopicProgressModel? progress =
+    topicController.completedTopicProgress[topic.id];
     return InkWell(
       borderRadius:
           BorderRadius.circular(18),
@@ -439,15 +441,14 @@ if (result == true) {
                               ),
                               const SizedBox(
                                   width: 4),
-                              Text(
-                                "${topic.estimatedDuration} mins",
-                                style:
-                                    const TextStyle(
-                                  fontWeight:
-                                      FontWeight
-                                          .w600,
-                                ),
-                              ),
+                             Text(
+  completed
+      ? "${progress?.durationMinutes ?? topic.estimatedDuration} mins"
+      : "${topic.estimatedDuration} mins",
+  style: const TextStyle(
+    fontWeight: FontWeight.w600,
+  ),
+),
                             ],
                           ),
                         ),

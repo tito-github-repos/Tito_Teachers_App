@@ -3,7 +3,7 @@ class PaymentSettingModel {
   final String subjectId;
   final String subjectName;
 
-  final double teacherRatePerMinute;
+  final double teacherRatePerHour;
   final double studentMonthlyFee;
 
   final bool isActive;
@@ -15,7 +15,7 @@ class PaymentSettingModel {
     required this.id,
     required this.subjectId,
     required this.subjectName,
-    required this.teacherRatePerMinute,
+    required this.teacherRatePerHour,
     required this.studentMonthlyFee,
     required this.isActive,
     required this.createdAt,
@@ -30,8 +30,8 @@ class PaymentSettingModel {
       id: id,
       subjectId: map['subjectId'] ?? '',
       subjectName: map['subjectName'] ?? '',
-      teacherRatePerMinute:
-          (map['teacherRatePerMinute'] ?? 0).toDouble(),
+      teacherRatePerHour:
+          (map['teacherRatePerHour'] ?? 0).toDouble(),
       studentMonthlyFee:
           (map['studentMonthlyFee'] ?? 0).toDouble(),
       isActive: map['isActive'] ?? true,
@@ -44,8 +44,8 @@ class PaymentSettingModel {
     return {
       'subjectId': subjectId,
       'subjectName': subjectName,
-      'teacherRatePerMinute':
-          teacherRatePerMinute,
+      'teacherRatePerHour':
+          teacherRatePerHour,
       'studentMonthlyFee':
           studentMonthlyFee,
       'isActive': isActive,

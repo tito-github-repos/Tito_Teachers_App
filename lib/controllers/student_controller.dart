@@ -8,7 +8,7 @@ class StudentController extends GetxController {
 
   final RxBool isLoading = false.obs;
   final RxList<UserModel> students = <UserModel>[].obs;
-
+final RxBool isSaving = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -26,4 +26,40 @@ class StudentController extends GetxController {
       isLoading.value = false;
     }
   }
+  
+  Future<void> saveStudentAssignment({
+  required String studentId,
+  required String classId,
+  required String className,
+  required List<String> subjectIds,
+   required Map<String,String> teacherAssignments,
+
+}) async {
+  try {
+    isSaving.value = true;
+
+    await _repository
+        .saveStudentAssignment(
+      studentId: studentId,
+      classId: classId,
+      className: className,
+      subjectIds: subjectIds,
+      teacherAssignments: teacherAssignments
+    );
+
+    await loadStudents();
+
+    Get.snackbar(
+      "Success",
+      "Student assignment updated successfully.",
+    );
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      e.toString(),
+    );
+  } finally {
+    isSaving.value = false;
+  }
+}
 }

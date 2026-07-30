@@ -22,8 +22,9 @@ class PaymentSettingsScreen extends StatelessWidget {
         title: const Text(
           "Payment Settings",
         ),
-        centerTitle: true,
-      ),
+centerTitle: true,
+      backgroundColor: Colors.indigo,
+      foregroundColor: Colors.white,      ),
 
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -173,7 +174,7 @@ class PaymentSettingsScreen extends StatelessWidget {
 
                 Expanded(
                   child: Text(
-                    "Teacher Rate / Minute",
+                    "Teacher Rate / Hour",
                     style: TextStyle(
                       color: Colors.grey[700],
                     ),
@@ -181,7 +182,7 @@ class PaymentSettingsScreen extends StatelessWidget {
                 ),
 
                 Text(
-                  "₹ ${setting.teacherRatePerMinute}",
+                  "₹ ${setting.teacherRatePerHour}",
                   style: const TextStyle(
                     fontWeight:
                         FontWeight.bold,
@@ -272,7 +273,7 @@ class PaymentSettingsScreen extends StatelessWidget {
     final teacherRateController = TextEditingController(
       text: setting == null
           ? ''
-          : setting.teacherRatePerMinute.toString(),
+          : setting.teacherRatePerHour.toString(),
     );
 
     final studentFeeController = TextEditingController(
@@ -343,7 +344,7 @@ class PaymentSettingsScreen extends StatelessWidget {
                           ),
                           decoration: const InputDecoration(
                             labelText:
-                                "Teacher Rate Per Minute",
+                                "Teacher Rate Per Hour",
                             prefixText: "₹ ",
                             border: OutlineInputBorder(),
                           ),
@@ -439,7 +440,7 @@ class PaymentSettingsScreen extends StatelessWidget {
                       subjectName:
                           selectedSubject!.name,
 
-                      teacherRatePerMinute:
+                      teacherRatePerHour:
                           double.parse(
                         teacherRateController.text
                             .trim(),

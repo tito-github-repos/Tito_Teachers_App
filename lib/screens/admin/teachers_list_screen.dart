@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tito_teachers_app/controllers/teachers_controller.dart';
+import 'package:tito_teachers_app/models/class_model.dart';
+import 'package:tito_teachers_app/models/subjects_model.dart';
+import 'package:tito_teachers_app/repositories/class_repo.dart';
+import 'package:tito_teachers_app/repositories/subject_repo.dart';
+import 'package:tito_teachers_app/screens/admin/widgets/teacher_card.dart';
 
 import '../../models/user_model.dart';
 
@@ -22,12 +28,23 @@ class _TeacherListScreenState
 
   final RxList<UserModel> filteredTeachers =
       <UserModel>[].obs;
+final ClassRepository _classRepository =
+    ClassRepository.instance;
 
+final SubjectRepository _subjectRepository =
+    SubjectRepository.instance;
+
+List<ClassModel> _classes = [];
+
+List<SubjectModel> _subjects = [];
+
+bool _isLoadingAssignments = false;
 @override
 void initState() {
   super.initState();
 
   controller.loadTeachers();
+  _loadAssignmentData();
 
   ever<List<UserModel>>(
     controller.teachers,
@@ -42,6 +59,53 @@ void initState() {
     searchController.dispose();
     super.dispose();
   }
+
+  Future<void> _loadAssignmentData() async {
+  try {
+    setState(() {
+      _isLoadingAssignments = true;
+    });
+
+    _classes =
+        await _classRepository.getActiveClasses();
+
+    _subjects =
+        await _subjectRepository.getActiveSubjects();
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      e.toString(),
+    );
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isLoadingAssignments = false;
+      });
+    }
+  }
+}
+
+List<SubjectModel> _getSubjectsForClass(
+    String classId) {
+  final classModel = _classes.firstWhere(
+    (e) => e.id == classId,
+    orElse: () => ClassModel(
+      id: '',
+      name: '',
+      order: 0,
+      isActive: true,
+      createdAt: Timestamp.now(),
+      subjectIds: [],
+    ),
+  );
+
+  return _subjects
+      .where(
+        (subject) => classModel.subjectIds
+            .contains(subject.id),
+      )
+      .toList();
+}
 
   void _searchTeachers(String keyword) {
     if (keyword.trim().isEmpty) {
@@ -281,10 +345,9 @@ Widget build(BuildContext context) {
                     ),
                     itemBuilder:
                         (context, index) {
-                      return _buildTeacherCard(
-                        filteredTeachers[
-                            index],
-                      );
+                     return TeacherCard(
+  teacher: filteredTeachers[index],
+);
                     },
                   );
                 }),
@@ -297,241 +360,6 @@ Widget build(BuildContext context) {
   );
 }
 
-Widget _buildTeacherCard(UserModel teacher) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.shade300,
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-
-        /// Header
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xff4F46E5),
-                Color(0xff6366F1),
-              ],
-            ),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Row(
-            children: [
-
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.white,
-                child: Text(
-                  teacher.name.isNotEmpty
-                      ? teacher.name[0].toUpperCase()
-                      : "?",
-                  style: const TextStyle(
-                    color: Colors.indigo,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 14),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-
-                    Text(
-                      teacher.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      teacher.email,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius:
-                      BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  "Active",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-
-              Row(
-                children: [
-
-                  const Icon(
-                    Icons.phone,
-                    color: Colors.indigo,
-                    size: 20,
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Text(
-                    teacher.phone,
-                    style: const TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  "Teaching Assignments",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey.shade800,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              if (teacher.teachingAssignments.isEmpty)
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius:
-                        BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    "No Assignments Available",
-                    textAlign: TextAlign.center,
-                  ),
-                )
-
-              else
-
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: teacher
-                        .teachingAssignments
-                        .map(
-                          (assignment) => Chip(
-                            avatar: const Icon(
-                              Icons.school,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                            backgroundColor:
-                                Colors.indigo,
-                            label: Text(
-                              "${assignment.className} • ${assignment.subjectName}",
-                              style:
-                                  const TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-
-              const SizedBox(height: 18),
-
-              // Row(
-              //   children: [
-
-              //     Expanded(
-              //       child: OutlinedButton.icon(
-              //         onPressed: () {
-              //           // View Details
-              //         },
-              //         icon: const Icon(
-              //           Icons.visibility,
-              //         ),
-              //         label: const Text("View"),
-              //       ),
-              //     ),
-
-              //     const SizedBox(width: 10),
-
-              //     Expanded(
-              //       child: ElevatedButton.icon(
-              //         style: ElevatedButton.styleFrom(
-              //           backgroundColor:
-              //               Colors.indigo,
-              //           foregroundColor:
-              //               Colors.white,
-              //         ),
-              //         onPressed: () {
-              //           // Edit Teacher
-              //         },
-              //         icon: const Icon(
-              //           Icons.edit,
-              //         ),
-              //         label: const Text("Edit"),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
 Widget _buildEmptyState() {
   return Container(
     width: double.infinity,

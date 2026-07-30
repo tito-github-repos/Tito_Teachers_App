@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tito_teachers_app/constants/date_helper.dart';
 
 import '../../../constants/enums.dart';
 import '../../../controllers/payment_controller.dart';
@@ -19,6 +20,8 @@ class PaymentReportsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Payment Reports"),
         centerTitle: true,
+      backgroundColor: Colors.indigo,
+      foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -112,13 +115,15 @@ class PaymentReportsScreen extends StatelessWidget {
                   labelText: "Month",
                   border: OutlineInputBorder(),
                 ),
-                items: List.generate(
-                  12,
-                  (index) => DropdownMenuItem(
-                    value: index + 1,
-                    child: Text("${index + 1}"),
-                  ),
-                ),
+               items: List.generate(
+  12,
+  (index) => DropdownMenuItem(
+    value: index + 1,
+    child: Text(
+      DateHelper.shortMonth(index + 1),
+    ),
+  ),
+),
                 onChanged: (value) {
                   controller.changeMonth(value!);
                 },
@@ -448,7 +453,10 @@ Widget _buildReportCard(
               Expanded(
                 child: _reportInfo(
                   "Month",
-                  "${payment.month}/${payment.year}",
+                  DateHelper.monthYear(
+    payment.month,
+    payment.year,
+  ),
                 ),
               ),
 
@@ -607,10 +615,13 @@ void _showPaymentDetails(
                 payment.role.toUpperCase(),
               ),
 
-              _infoRow(
-                "Month",
-                "${payment.month}/${payment.year}",
-              ),
+             _infoRow(
+  "Month",
+  DateHelper.monthYear(
+    payment.month,
+    payment.year,
+  ),
+),
 
               _infoRow(
                 "Status",

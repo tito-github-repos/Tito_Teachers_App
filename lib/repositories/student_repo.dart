@@ -15,4 +15,29 @@ class StudentRepository {
         .map((doc) => UserModel.fromJson(doc.data()))
         .toList();
   }
+  Future<void> saveStudentAssignment({
+  required String studentId,
+  required String classId,
+  required String className,
+  required List<String> subjectIds,
+   required Map<String,String> teacherAssignments,
+
+}) async {
+  await _firestore
+      .collection("users")
+      .doc(studentId)
+      .update({
+    "classId": classId,
+    "className": className,
+    "subjectIds": subjectIds,
+    "assignedTeachers": teacherAssignments.entries
+    .map(
+      (e) => {
+        "subjectId": e.key,
+        "teacherId": e.value,
+      },
+    )
+    .toList(),
+  });
+}
 }
